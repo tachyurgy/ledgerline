@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerline — real-time order decisioning with chained models</title>
+<meta name="description" content="A real-time ecommerce fraud decisioning engine: three specialist sub-models chained into a consortium model, exact log-odds attribution per signal, and a margin curve that prices the decision instead of minimising fraud.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;550;650&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<style>
+  :root { --accent:#54c8e8; --accent-dim:#1d7794; --accent-ink:#021419; --bg:#0c1116; --panel:#151c23; --panel-2:#1b242c; --line:#232e38; }
+  #policy { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:16px; }
+  #policy .fld { gap:6px; }
+  #queue { max-height: 640px; overflow-y:auto; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><h1>Ledgerline</h1><span class="tag">order decisioning</span></div>
+    <div class="top-spacer"></div>
+    <div class="clockline">1,200 orders · 5 merchants · liability-bearing policy</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="lede">
+    Deciding an ecommerce order in real time is not a fraud-detection problem, it is a pricing
+    problem: whoever carries the chargeback also carries the cost of every good customer they turn
+    away. This engine chains three specialist sub-models — address manipulation, IP and device, basket
+    composition — into a consortium model that also sees cross-merchant velocity, then reports the
+    <em>exact</em> log-odds contribution of every signal. Move the thresholds and watch net margin,
+    not just fraud, respond.
+  </p>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="cols" style="margin-top:0">
+    <div>
+      <div class="panel">
+        <h2>Decision policy</h2>
+        <div class="pad" id="policy"></div>
+      </div>
+      <div class="panel">
+        <h2>Margin curve across decline thresholds</h2>
+        <div class="pad" id="frontier"></div>
+      </div>
+      <div class="panel">
+        <h2>Order stream <span class="h2spacer"></span><span class="count" id="qCount"></span></h2>
+        <div class="controls" id="filters">
+          <button class="primary" data-f="all">All</button>
+          <button data-f="approve">Approved</button>
+          <button data-f="review">Review</button>
+          <button data-f="decline">Declined</button>
+        </div>
+        <div id="queue"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Decision explanation</h2>
+      <div id="detail"></div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p style="margin:0 0 9px"><strong>How it is built.</strong>
+      <code>model.js</code> is four logistic regressions. Three specialists score their own signal
+      family; their probabilities become features of the consortium model alongside signals only a
+      network can see — the same card hitting five merchants in a day. Because the top model is linear
+      in log-odds, attribution is exact: every bar is <code>weight × value</code>, and the bars plus
+      the bias sum to <code>z</code>. Approximating that with a post-hoc explainer would be strictly
+      worse and slower.</p>
+    <p style="margin:0">Orders are synthetic and seeded, but fraud is drawn from genuinely different
+      signal distributions rather than by relabelling random rows — young identities, IP-to-billing
+      distance, resale-liquid baskets, expedited shipping, cross-merchant velocity. A demo where the
+      classes are not actually separable would be a lie about how well the model works.</p>
+  </footer>
+</div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
